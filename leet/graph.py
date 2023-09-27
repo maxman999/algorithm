@@ -175,7 +175,7 @@ def myNumIslands(grid: List[List[str]]) -> int:
     return count
 
 
-def myLetterCombinations(digits: str, dict) -> List[str]:
+def myLetterCombinations1(digits: str, dict) -> List[str]:
     result = []
 
     def backTrac(idx, path):
@@ -320,7 +320,7 @@ def mySubsets(nums: List[int]) -> List[List[int]]:
     return result
 
 
-def findItinerary(tickets: List[List[str]]) -> List[str]:
+def findItinerary_recursive(tickets: List[List[str]]) -> List[str]:
     graph = collections.defaultdict(list)
     # 그래프 순서대로 구성
     for a, b in sorted(tickets, reverse=True):
@@ -340,26 +340,99 @@ def findItinerary(tickets: List[List[str]]) -> List[str]:
     return route[::-1]
 
 
+def findItinerary_iterative(tickets: List[List[str]]) -> List[str]:
+    graph = collections.defaultdict(list)
+    # 그래프 순서대로 구성
+    for a, b in sorted(tickets):
+        graph[a].append(b)
+
+    route, stack = [], ['JFK']
+
+    while stack:
+        # 반복으로 스택을 구성하되 막히는 부분에서 풀어내는 처리
+        while graph[stack[-1]]:
+            stack.append(graph[stack[-1]].pop(0))
+        route.append(stack.pop())
+
+    return route[::-1]
+
+
+def myFindItinerary(tickets: List[List[str]]) -> List[str]:
+    adj = collections.defaultdict(list)
+    for a, b in sorted(tickets):
+        adj[a].append(b)
+
+    result = []
+
+    def backtrack(curr):
+        result.append(curr)
+        while adj[curr]:
+            backtrack(adj[curr].pop(0))
+
+        return
+
+    backtrack("JFK")
+
+    return result
+
+
+def canFinish(numCourses: int, prerequisites: List[List[int]]) -> bool:
+    graph = collections.defaultdict(list)
+    for a, b in prerequisites:
+        graph[a].append(b)
+
+    traced = set()
+
+    def dfs(i):
+        # 순환 구조이면 False
+        if i in traced:
+            return False
+        traced.add(i)
+        for y in graph[i]:
+            if not dfs(y):
+                return False
+        # 탐색 종료 후 순환 노드 삭제
+        traced.remove(i)
+        return True
+
+    # 순환 구조 판별
+    for x in list(graph):
+        if not dfs(x):
+            return False
+
+    return True
+
+
 if __name__ == '__main__':
+    # prerequisites = [[0, 10], [3, 18], [5, 5], [6, 11], [11, 14], [13, 1], [15, 1], [17, 4]]
+    # prerequisites1 = [[0, 1], [1, 0]]
+    # prerequisites2 = [[1, 0]]
+    # print(canFinish(8, prerequisites))
+    # print(canFinish(2, prerequisites1))
+    # print(canFinish(1, prerequisites2))
+
     # ["JFK","MUC","LHR","SFO","SJC"]
-    tickets = [["JFK", "SFO"], ["JFK", "ATL"], ["SFO", "ATL"], ["ATL", "JFK"], ["ATL", "SFO"]]
-    # tickets = [["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]]
-    print(findItinerary(tickets))
+    tickets1 = [["JFK", "SFO"], ["JFK", "ATL"], ["SFO", "ATL"], ["ATL", "JFK"], ["ATL", "SFO"]]
+    tickets2 = [["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]]
+    tickets3 = [["JFK", "NRT"], ["JFK", "KUL"], ["KUL", "JFK"]]
+    tickets4 = [["JFK", "NRT"], ["JFK", "KUL"], ["NRT", "JFK"]]
+
+    print(findItinerary_recursive(tickets3))
 
     # print(mySubsets(nums))
     # print(subsets(nums))
 
     # print(combinationSum(candidates, target))
 
-    grid = [
-        ['1', '1', '1', '1', '0'],
-        ['1', '1', '0', '1', '0'],
-        ['1', '1', '0', '0', '0'],
-        ['0', '0', '0', '0', '0']
-    ]
-
-    dic = {"2": "abc", "3": "def", "4": "ghi", "5": "jkl",
-           "6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz"}
+    # grid = [
+    #     ['1', '1', '1', '1', '0'],
+    #     ['1', '1', '0', '1', '0'],
+    #     ['1', '1', '0', '0', '0'],
+    #     ['0', '0', '0', '0', '0']
+    # ]
+    #
+    # dic = {"2": "abc", "3": "def", "4": "ghi", "5": "jkl",
+    #        "6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz"}
 
     graph = {
         1: [2, 3, 4, 6],
