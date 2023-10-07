@@ -88,6 +88,28 @@ def findCheapestPrice(n: int, flights: List[List[int]], src: int, dst: int, k: i
     return -1
 
 
+def myNetworkDelayTime2(times: List[List[int]], n: int, k: int) -> int:
+    graph = collections.defaultdict(list)
+    for s, e, d in times:
+        graph[s].append((e, d))
+
+    Q = [(0, k)]
+    dist = {}
+
+    while Q:
+        w1, prev_node = heapq.heappop(Q)
+        if prev_node not in dist:
+            dist[prev_node] = w1
+
+            for n, w2 in graph[prev_node]:
+                heapq.heappush(Q, (w1 + w2, n))
+
+    if len(dist) < n:
+        return -1
+
+    return max(dist.values())
+
+
 if __name__ == "__main__":
     # n = 4
     # flights = [[0, 1, 100], [1, 2, 100], [2, 0, 100], [1, 3, 600], [2, 3, 200]]
@@ -101,17 +123,17 @@ if __name__ == "__main__":
     # dst = 3
     # k = 1
 
-    n = 5
-    flights = [[0, 1, 5], [1, 2, 5], [0, 3, 2], [3, 1, 2], [1, 4, 1], [4, 2, 1]]
-    src = 0
-    dst = 2
-    k = 2
-
-    print(findCheapestPrice(n, flights, src, dst, k))
-    print(myFindCheapestPrice(n, flights, src, dst, k))
+    # n = 5
+    # flights = [[0, 1, 5], [1, 2, 5], [0, 3, 2], [3, 1, 2], [1, 4, 1], [4, 2, 1]]
+    # src = 0
+    # dst = 2
+    # k = 2
+    #
+    # print(findCheapestPrice(n, flights, src, dst, k))
+    # print(myFindCheapestPrice(n, flights, src, dst, k))
 
     # times = [[3, 1, 5], [3, 2, 2], [2, 1, 2], [3, 4, 1], [4, 5, 2], [5, 6, 1], [6, 7, 1], [7, 8, 1], [8, 1, 1]]
-    # times = [[2, 1, 1], [2, 3, 1], [3, 4, 1]]
-    # N = 8
-    # K = 3
-    # print(myNetworkDelayTime(times, N, K))
+    times = [[2, 1, 1], [2, 3, 1], [3, 4, 1]]
+    N = 4
+    K = 2
+    print(myNetworkDelayTime2(times, N, K))
