@@ -1,14 +1,7 @@
 import collections
 from typing import *
 import heapq
-import functools
-import itertools
-import re
-import sys
-import math
-import bisect
-from modules.ListNode import NodeGenerator
-from modules.ListNode import ListNode
+from modules.ListNode import ListNode, NodeGenerator
 
 
 def validateParenthesis(s: str) -> bool:
@@ -27,6 +20,54 @@ def validateParenthesis(s: str) -> bool:
     return len(stack) == 0
 
 
+def myValidateParenthesis(s: str) -> bool:
+    parenthesis_map = {
+        "{": "}",
+        "(": ")",
+        "[": "]",
+    }
+
+    stack = []
+    for char in s:
+        if char in parenthesis_map:
+            stack.append(char)
+        else:
+            if not stack or char != parenthesis_map.get(stack.pop()):
+                return False
+
+    return len(stack) == 0
+
+
+def removeDuplicateLetters(s: str) -> str:
+    counter, seen, stack = collections.Counter(s), set(), []
+
+    temp = set(s)
+
+    for char in s:
+        counter[char] -= 1
+        if char in seen:
+            continue
+        # 뒤에 붙일 문자가 남아 있다면 스택에서 제거
+        while stack and char < stack[-1] and counter[stack[-1]] > 0:
+            seen.remove(stack.pop())
+        stack.append(char)
+        seen.add(char)
+    return ''.join(stack)
+
+
+def dailyTemperatures(temperatures: List[int]) -> List[int]:
+    result = [0] * len(temperatures)
+    stack = []
+
+    for i, cur in enumerate(temperatures):
+        while stack and cur > temperatures[stack[-1]]:
+            last = stack.pop()
+            result[last] = i - last
+        stack.append(i)
+
+    return result
+
+
 def weatherForecast(T: List[int]) -> List:
     answer = [0] * len(T)
     stack = []
@@ -43,7 +84,6 @@ def mergeKLists(lists: List[ListNode]) -> ListNode:
     root = result = ListNode(None)
     heap = []
 
-    # 각 연결리스트의 루트를 힙에 저장
     for i in range(len(lists)):
         if lists[i]:
             heapq.heappush(heap, (lists[i].val, i, lists[i]))
@@ -62,25 +102,18 @@ def mergeKLists(lists: List[ListNode]) -> ListNode:
 
 
 def myMergeKLists(lists: List[ListNode]) -> ListNode:
+    result = head = ListNode(None)
     heap = []
-    root = result = ListNode(None)
-
     for i in range(len(lists)):
-        node = lists[i]
-        heapq.heappush(heap, (node.val, i, node))
+        heapq.heappush(heap, (lists[i].val, i, lists[i]))
 
     while heap:
-        popped = heapq.heappop(heap)
-        prior_node = popped[2]
-        idx = popped[1]
-
-        result.next = prior_node
-        result = result.next
-
-        if prior_node.next:
-            heapq.heappush(heap, (prior_node.next.val, idx, prior_node.next))
-
-    return root.next
+        curr = heapq.heappop(heap)
+        head.next = curr[2]
+        head = head.next
+        if curr[2].next:
+            heapq.heappush(heap, (curr[2].next.val, curr[1], curr[2].next))
+    return result.next
 
 
 if __name__ == '__main__':
@@ -88,9 +121,16 @@ if __name__ == '__main__':
     list2 = NodeGenerator(1, 3, 4).head
     list3 = NodeGenerator(2, 6).head
     target_lists = [list1, list2, list3]
-
     merged_list = myMergeKLists(target_lists)
 
     while merged_list:
         print(merged_list.val)
         merged_list = merged_list.next
+
+    # s = "]"
+    # print(myValidateParenthesis(s))
+    #
+    # s = "cbacdcbc"
+    # print(removeDuplicateLetters(s))
+    # temperatures = [73, 74, 75, 71, 69, 72, 76, 73]
+    # print(dailyTemperatures(temperatures))

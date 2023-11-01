@@ -123,22 +123,6 @@ def lengthOfLongestSubstring(s: str) -> int:
     return max_length
 
 
-def myLengthOfLongestSubstring(s: str) -> int:
-    used = {}
-    start = 0
-    max_length = 0
-
-    for index, char in enumerate(s):
-        if char in used and start <= used[char]:
-            start = used[char] + 1
-        else:
-            max_length = max(max_length, index - start + 1)
-
-        used[char] = index
-
-    return max_length
-
-
 def topKFrequent(nums: List[int], k: int) -> List[int]:
     counter = {}
     result_heap = []
@@ -159,8 +143,24 @@ def topKFrequent(nums: List[int], k: int) -> List[int]:
     return result
 
 
+def myTopKFrequent(nums: List[int], k: int) -> List[int]:
+    result = []
+    Q = []
+    dict = collections.Counter(nums)
+    for key in dict:
+        heapq.heappush(Q, (-dict[key], key))
+
+    for _ in range(k):
+        result.append(heapq.heappop(Q)[1])
+
+    return result
+
+
 if __name__ == '__main__':
-    nums = [4, 1, -1, 2, -1, 2, 3]
+    nums = [1,1,1,2,2,3]
     k = 2
 
-    print(topKFrequent(nums, k))
+    print(myTopKFrequent(nums, k))
+
+    # s = "abcabcbb"
+    # print(lengthOfLongestSubstring(s))
